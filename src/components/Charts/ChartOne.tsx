@@ -1,190 +1,169 @@
 "use client";
-
 import { ApexOptions } from "apexcharts";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
+import { getProductsOrderedByMostSoldByWeek, getProductsOrderedByMostSoldByMonth } from "../../api/api"; // Adjust the import path as needed
 
 const ReactApexChart = dynamic(() => import("react-apexcharts"), {
   ssr: false,
 });
 
-const options: ApexOptions = {
-  legend: {
-    show: false,
-    position: "top",
-    horizontalAlign: "left",
-  },
-  colors: ["#3C50E0", "#80CAEE"],
+const initialOptions: ApexOptions = {
   chart: {
-    fontFamily: "Satoshi, sans-serif",
-    height: 335,
-    type: "area",
-    dropShadow: {
-      enabled: true,
-      color: "#623CEA14",
-      top: 10,
-      blur: 4,
-      left: 0,
-      opacity: 0.1,
-    },
-
-    toolbar: {
-      show: false,
-    },
+    type: 'bar',
+    height: 350,
   },
-  responsive: [
-    {
-      breakpoint: 1024,
-      options: {
-        chart: {
-          height: 300,
-        },
-      },
-    },
-    {
-      breakpoint: 1366,
-      options: {
-        chart: {
-          height: 350,
-        },
-      },
-    },
-  ],
-  stroke: {
-    width: [2, 2],
-    curve: "straight",
-  },
-  // labels: {
-  //   show: false,
-  //   position: "top",
-  // },
-  grid: {
-    xaxis: {
-      lines: {
-        show: true,
-      },
-    },
-    yaxis: {
-      lines: {
-        show: true,
-      },
+  plotOptions: {
+    bar: {
+      horizontal: false,
+      columnWidth: '55%',
+      endingShape: 'rounded',
     },
   },
   dataLabels: {
     enabled: false,
   },
-  markers: {
-    size: 4,
-    colors: "#fff",
-    strokeColors: ["#3056D3", "#80CAEE"],
-    strokeWidth: 3,
-    strokeOpacity: 0.9,
-    strokeDashArray: 0,
-    fillOpacity: 1,
-    discrete: [],
-    hover: {
-      size: undefined,
-      sizeOffset: 5,
-    },
+  stroke: {
+    show: true,
+    width: 2,
+    colors: ['transparent'],
   },
   xaxis: {
-    type: "category",
-    categories: [
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-    ],
-    axisBorder: {
-      show: false,
-    },
-    axisTicks: {
-      show: false,
-    },
+    categories: [],
   },
   yaxis: {
     title: {
-      style: {
-        fontSize: "0px",
-      },
+      text: 'Quantity Sold',
     },
-    min: 0,
-    max: 100,
+  },
+  fill: {
+    opacity: 1,
+  },
+  tooltip: {
+    y: {
+      formatter: (val) => `${val} units`,
+    },
   },
 };
 
-interface ChartOneState {
-  series: {
-    name: string;
-    data: number[];
-  }[];
-}
+const ChartComponent: React.FC = () => {
+  const [options, setOptions] = useState<ApexOptions>(initialOptions);
+  const [series, setSeries] = useState<{ name: string; data: number[] }[]>([
+    {
+      name: "Quantity Sold",
+      data: [],
+    },
+  ]);
+  const [dateRange, setDateRange] = useState<string>('');
 
-const ChartOne: React.FC = () => {
-  const series = [
-      {
-        name: "Product One",
-        data: [23, 11, 22, 27, 13, 22, 37, 21, 44, 22, 30, 45],
-      },
+  const formatDate = (date: Date) => {
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
 
-      {
-        name: "Product Two",
-        data: [30, 25, 36, 30, 45, 35, 64, 52, 59, 36, 39, 51],
-      },
-    ]
+  const getWeekRange = () => {
+    const today = new Date();
+    const lastWeek = new Date(today);
+    lastWeek.setDate(today.getDate() - 6);
+    return `${formatDate(lastWeek)} - ${formatDate(today)}`;
+  };
+
+  const getMonthRange = () => {
+    const today = new Date();
+    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    return `${formatDate(startOfMonth)} - ${formatDate(today)}`;
+  };
+
+  const fetchWeeklyData = async () => {
+    try {
+      const data = await getProductsOrderedByMostSoldByWeek();
+      const productNames = data.map((item: any) => item.title); // Change item.productName to item.title
+      const quantities = data.map((item: any) => Number(item.sales_count)); // Change item.quantitySold to item.sales_count
+
+      setSeries([
+        {
+          name: "Quantity Sold",
+          data: quantities,
+        },
+      ]);
+      setOptions((prevOptions) => ({
+        ...prevOptions,
+        xaxis: {
+          categories: productNames,
+        },
+      }));
+      setDateRange(getWeekRange());
+    } catch (error) {
+      console.error("Error fetching weekly data:", error);
+    }
+  };
+
+  const fetchMonthlyData = async () => {
+    try {
+      const data = await getProductsOrderedByMostSoldByMonth();
+      const productNames = data.map((item: any) => item.title); // Change item.productName to item.title
+      const quantities = data.map((item: any) => Number(item.sales_count)); // Change item.quantitySold to item.sales_count
+
+      console.log('data',data)
+      console.log('productNames',productNames)
+      console.log('quantities',quantities)
+
+      setSeries([
+        {
+          name: "Quantity Sold",
+          data: quantities,
+        },
+      ]);
+      setOptions((prevOptions) => ({
+        ...prevOptions,
+        xaxis: {
+          categories: productNames,
+        },
+      }));
+      setDateRange(getMonthRange());
+    } catch (error) {
+      console.error("Error fetching monthly data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchWeeklyData();
+  }, []);
 
   return (
     <div className="col-span-12 rounded-sm border border-stroke bg-white px-5 pb-5 pt-7.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:col-span-8">
-      <div className="flex flex-wrap items-start justify-between gap-3 sm:flex-nowrap">
-        <div className="flex w-full flex-wrap gap-3 sm:gap-5">
-          <div className="flex min-w-47.5">
-            <span className="mr-2 mt-1 flex h-4 w-full max-w-4 items-center justify-center rounded-full border border-primary">
-              <span className="block h-2.5 w-full max-w-2.5 rounded-full bg-primary"></span>
-            </span>
-            <div className="w-full">
-              <p className="font-semibold text-primary">Total Revenue</p>
-              <p className="text-sm font-medium">12.04.2022 - 12.05.2022</p>
-            </div>
-          </div>
-          <div className="flex min-w-47.5">
-            <span className="mr-2 mt-1 flex h-4 w-full max-w-4 items-center justify-center rounded-full border border-secondary">
-              <span className="block h-2.5 w-full max-w-2.5 rounded-full bg-secondary"></span>
-            </span>
-            <div className="w-full">
-              <p className="font-semibold text-secondary">Total Sales</p>
-              <p className="text-sm font-medium">12.04.2022 - 12.05.2022</p>
-            </div>
-          </div>
-        </div>
-        <div className="flex w-full max-w-45 justify-end">
-          <div className="inline-flex items-center rounded-md bg-whiter p-1.5 dark:bg-meta-4">
-            <button className="rounded bg-white px-3 py-1 text-xs font-medium text-black shadow-card hover:bg-white hover:shadow-card dark:bg-boxdark dark:text-white dark:hover:bg-boxdark">
-              Day
-            </button>
-            <button className="rounded px-3 py-1 text-xs font-medium text-black hover:bg-white hover:shadow-card dark:text-white dark:hover:bg-boxdark">
-              Week
-            </button>
-            <button className="rounded px-3 py-1 text-xs font-medium text-black hover:bg-white hover:shadow-card dark:text-white dark:hover:bg-boxdark">
-              Month
-            </button>
-          </div>
+      <h5 className="text-xl font-semibold text-black dark:text-white">
+            Sold Products Quantity
+          </h5>
+      <div className="flex w-full max-w-45 justify-end">
+        <div className="inline-flex items-center rounded-md bg-whiter p-1.5 dark:bg-meta-4">
+          <button
+            onClick={fetchWeeklyData}
+            className="rounded px-3 py-1 text-xs font-medium text-black hover:bg-white hover:shadow-card dark:text-white dark:hover:bg-boxdark"
+          >
+           This Week
+          </button>
+          <button
+            onClick={fetchMonthlyData}
+            className="rounded px-3 py-1 text-xs font-medium text-black hover:bg-white hover:shadow-card dark:text-white dark:hover:bg-boxdark"
+          >
+           This Month
+          </button>
         </div>
       </div>
 
+      <div className="mt-4">
+        <p className="text-center font-medium text-lg">{dateRange}</p>
+      </div>
+
       <div>
-        <div id="chartOne" className="-ml-5">
+        <div id="chart">
           <ReactApexChart
             options={options}
             series={series}
-            type="area"
+            type="bar"
             height={350}
             width={"100%"}
           />
@@ -194,4 +173,4 @@ const ChartOne: React.FC = () => {
   );
 };
 
-export default ChartOne;
+export default ChartComponent;

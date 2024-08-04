@@ -5,6 +5,8 @@ import "@/css/satoshi.css";
 import "@/css/style.css";
 import React, { useEffect, useState } from "react";
 import Loader from "@/components/common/Loader";
+import { findAllCategories } from "@/api/api";
+import { CategoryContext } from "@/components/Context/CategoryContext";
 
 export default function RootLayout({
   children,
@@ -13,6 +15,21 @@ export default function RootLayout({
 }>) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loading, setLoading] = useState<boolean>(true);
+  const [category, setCategory] = useState([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const categories = await findAllCategories();
+        setCategory(categories);
+      } catch (error) {
+        console.error('Error fetching categories:', error.message);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
 
   // const pathname = usePathname();
 
@@ -21,6 +38,7 @@ export default function RootLayout({
   }, []);
 
   return (
+    <CategoryContext.Provider value={{ category, setCategory }}>
     <html lang="en">
       <body suppressHydrationWarning={true}>
         <div className="dark:bg-boxdark-2 dark:text-bodydark">
@@ -28,5 +46,6 @@ export default function RootLayout({
         </div>
       </body>
     </html>
+    </CategoryContext.Provider>
   );
 }
