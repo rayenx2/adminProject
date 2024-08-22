@@ -7,6 +7,7 @@ import React, { useEffect, useState } from "react";
 import Loader from "@/components/common/Loader";
 import { findAllCategories } from "@/api/api";
 import { CategoryContext } from "@/components/Context/CategoryContext";
+import {AuthProvider} from "../components/Providers/Providers"
 
 export default function RootLayout({
   children,
@@ -41,9 +42,11 @@ export default function RootLayout({
     <CategoryContext.Provider value={{ category, setCategory }}>
     <html lang="en">
       <body suppressHydrationWarning={true}>
+        <AuthProvider>
         <div className="dark:bg-boxdark-2 dark:text-bodydark">
           {loading ? <Loader /> : children}
         </div>
+        </AuthProvider>
       </body>
     </html>
     </CategoryContext.Provider>

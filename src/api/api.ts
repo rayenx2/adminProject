@@ -416,3 +416,46 @@ export const deleteOrderProduct = async (orderId, productId) => {
     throw error;
   }
 }
+
+export const createAdmin = async (userData) => {
+  try {
+    const response = await axiosClient.post('/users/create-admin', userData);
+    console.log('Response:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error creating user:', error);
+    throw new Error('Failed to create user. Please try again later.');
+  }
+};
+
+export const getUserByEmail = async (email: string) => {
+  try {
+    const response = await axios.get(`/api/users/email/${email}`);
+    console.log('Response:', response.data);
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response?.status === 404) {
+      console.error(`User not found with email: ${email}`);
+      return null;
+    }
+    throw error; // Rethrow other errors
+  }
+};
+
+
+export const verifyUser = async (email, password) => {
+  try {
+    // Make a POST request to the verifyUser endpoint
+    const response = await axiosClient.post('/users/verifyUser', {
+      email,
+      password,
+    });
+    console.log('Response:', response.data);
+    // If the request is successful, return the user data
+    return response.data;
+  } catch (error) {
+    // Handle any errors (e.g., user not found or invalid credentials)
+    console.error('Error verifying user:', error);
+    return null; // Returning null to indicate failure
+  }
+};

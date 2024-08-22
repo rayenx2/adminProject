@@ -1,15 +1,20 @@
+'use client'
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import Image from "next/image";
 import { Metadata } from "next";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
+import { useSession } from "next-auth/react";
 
-export const metadata: Metadata = {
-  title: "Next.js Settings | TailAdmin - Next.js Dashboard Template",
-  description:
-    "This is Next.js Settings page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template",
-};
+// export const metadata: Metadata = {
+//   title: "Next.js Settings | TailAdmin - Next.js Dashboard Template",
+//   description:
+//     "This is Next.js Settings page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template",
+// };
 
 const Settings = () => {
+  const { data: session } = useSession();
+
+
   return (
     <DefaultLayout>
       <div className="mx-auto max-w-270">
@@ -65,7 +70,7 @@ const Settings = () => {
                           name="fullName"
                           id="fullName"
                           placeholder="Devid Jhon"
-                          defaultValue="Devid Jhon"
+                          defaultValue={session?.user?.name}
                         />
                       </div>
                     </div>
@@ -127,12 +132,12 @@ const Settings = () => {
                         name="emailAddress"
                         id="emailAddress"
                         placeholder="devidjond45@gmail.com"
-                        defaultValue="devidjond45@gmail.com"
+                        defaultValue={session?.user.email}
                       />
                     </div>
                   </div>
 
-                  <div className="mb-5.5">
+                  {/* <div className="mb-5.5">
                     <label
                       className="mb-3 block text-sm font-medium text-black dark:text-white"
                       htmlFor="Username"
@@ -147,7 +152,7 @@ const Settings = () => {
                       placeholder="devidjhon24"
                       defaultValue="devidjhon24"
                     />
-                  </div>
+                  </div> */}
 
                   <div className="mb-5.5">
                     <label

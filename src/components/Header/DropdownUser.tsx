@@ -1,12 +1,43 @@
+"use client"
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import ClickOutside from "@/components/ClickOutside";
+import { signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 const DropdownUser = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const { data: session } = useSession();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    await signOut({ redirect: false }); // Prevent automatic redirection by NextAuth
+    router.push('/auth/signin'); // Redirect to the sign-in page after logging out
+  };
+
 
   return (
+
+    // <div className="mb-7.5 flex flex-wrap gap-5 xl:gap-8">
+      
+
+    //   <Link
+    //           href="#"
+    //           className="inline-flex items-center justify-center rounded-md border border-meta-3 px-10 py-4 text-center font-medium text-meta-3 hover:bg-opacity-90 lg:px-8 xl:px-10"
+    //         >
+    //           Log In
+    //   </Link>
+    //   <Link
+    //           href="#"
+    //           className="inline-flex items-center justify-center rounded-md bg-primary px-10 py-4 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10"
+    //         >
+    //           Sign In
+    //   </Link>
+
+    // </div>
+    
     <ClickOutside onClick={() => setDropdownOpen(false)} className="relative">
       <Link
         onClick={() => setDropdownOpen(!dropdownOpen)}
@@ -15,16 +46,18 @@ const DropdownUser = () => {
       >
         <span className="hidden text-right lg:block">
           <span className="block text-sm font-medium text-black dark:text-white">
-            Thomas Anree
+          {session?.user?.name}
           </span>
-          <span className="block text-xs">UX Designer</span>
+          <span className="block text-xs">{session?.user?.email}</span>
         </span>
+
+        
 
         <span className="h-12 w-12 rounded-full">
           <Image
             width={112}
             height={112}
-            src={"/images/user/user-01.png"}
+            src={session?.user?.image !== null ? session.user.image : "https://i.pinimg.com/736x/09/21/fc/0921fc87aa989330b8d403014bf4f340.jpg"}
             style={{
               width: "auto",
               height: "auto",
@@ -128,7 +161,10 @@ const DropdownUser = () => {
               </Link>
             </li>
           </ul>
-          <button className="flex items-center gap-3.5 px-6 py-4 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base">
+          <button
+           onClick={handleLogout } 
+           className="flex items-center gap-3.5 px-6 py-4 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"
+           >
             <svg
               className="fill-current"
               width="22"

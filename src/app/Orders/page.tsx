@@ -24,6 +24,7 @@ import InputLabel from '@mui/material/InputLabel';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
+import Breadcrumb from '@/components/Breadcrumbs/Breadcrumb';
 
 const columns = [
   { id: 'email', label: 'Email', minWidth: 150 },
@@ -169,6 +170,7 @@ const Order = () => {
 
   return (
     <DefaultLayout>
+      <Breadcrumb pageName="Orders" />
     <div>
       <h1>Orders</h1>
       <br />

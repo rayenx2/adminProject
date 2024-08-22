@@ -34,6 +34,7 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import { Metadata } from "next";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
+import Breadcrumb from '@/components/Breadcrumbs/Breadcrumb';
 
 
 
@@ -196,6 +197,7 @@ const Products = () => {
 
   return (
     <DefaultLayout>
+      <Breadcrumb pageName="Products" />
     <div >
       <h1>Products</h1>
       <br />

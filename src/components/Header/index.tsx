@@ -4,12 +4,18 @@ import DropdownMessage from "./DropdownMessage";
 import DropdownNotification from "./DropdownNotification";
 import DropdownUser from "./DropdownUser";
 import Image from "next/image";
+import { useEffect, useState } from "react";
 
 const Header = (props: {
   sidebarOpen: string | boolean | undefined;
   setSidebarOpen: (arg0: boolean) => void;
 }) => {
-  return (
+  const [isLogin,setIsLogin]=useState();
+  useEffect(()=>{
+    setIsLogin(window.location.href.toString().includes('/auth/signin')  )
+  },[] )
+  
+  return !isLogin&& (
     <header className="sticky top-0 z-999 flex w-full bg-white drop-shadow-1 dark:bg-boxdark dark:drop-shadow-none">
       <div className="flex flex-grow items-center justify-between px-4 py-4 shadow-2 md:px-6 2xl:px-11">
         <div className="flex items-center gap-2 sm:gap-4 lg:hidden">
@@ -118,7 +124,24 @@ const Header = (props: {
           </ul>
 
           {/* <!-- User Area --> */}
-          <DropdownUser />
+          {/* {isLogin ? ( */}
+            <DropdownUser />
+          {/* ) : (
+            <div className="flex items-center gap-2">
+              <Link
+                href="#"
+                className="inline-flex items-center justify-center rounded-md border border-meta-3 px-10 py-4 text-center font-medium text-meta-3 hover:bg-opacity-90 lg:px-8 xl:px-10"
+              >
+                Log in
+              </Link>
+              <Link
+                href="#"
+                className="inline-flex items-center justify-center rounded-md bg-primary px-10 py-4 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10"
+              >
+                Sign up
+              </Link>
+            </div>
+          )} */}
           {/* <!-- User Area --> */}
         </div>
       </div>

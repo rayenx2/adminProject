@@ -25,6 +25,7 @@ import Typography from '@mui/material/Typography'; // Import Typography for text
 import Button from '@mui/material/Button'; // Import Button for clickable area
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import Link from "next/link";
+import Breadcrumb from '@/components/Breadcrumbs/Breadcrumb';
 
 const columns = [
   { id: 'name', label: 'Name', minWidth: 150 },
@@ -162,6 +163,7 @@ const Categories = () => {
 
   return (
     <DefaultLayout>
+      <Breadcrumb pageName="Categories" />
     <div >
       <h1 id="categories">Categories</h1>
       <Button
